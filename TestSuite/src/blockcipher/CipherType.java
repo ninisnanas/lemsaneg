@@ -9,6 +9,8 @@ package blockcipher;
  *
  * @author nisrinarahmah
  */
-public class CipherType {
-    
+public enum CipherType {
+    AES,
+    DES,
+    RANDOM
 }

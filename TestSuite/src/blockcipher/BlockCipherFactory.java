@@ -12,9 +12,25 @@ package blockcipher;
 public class BlockCipherFactory {
     private byte[] key;
     
+    public BlockCipherFactory() {}
+    
+    public BlockCipherFactory(byte[] key) {
+        this.key = key;
+    } 
+    
     public byte[] getEncrypt(byte[] plain, CipherType type) {
-        
-        return null;
+        byte[] result = null;
+        switch(type) {
+            case AES:
+                result = EncryptAES(plain);
+                break;
+            case DES:
+                result = EncryptDES(plain);
+                break;
+            case RANDOM:
+                break;
+        }
+        return result;
     }
     
     private byte[] EncryptAES(byte[] plain) {
