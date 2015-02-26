@@ -109,7 +109,7 @@ public class BIC {
         String input = "";
         
         for(int i = 0; i < 32; i++) {
-            int base = (int) (Math.random() * 16);
+            int base = (int) (Math.random() * 15);
             switch(base) {
                 case 10:
                     input += 'A';
@@ -127,9 +127,6 @@ public class BIC {
                     input += 'E';
                     break;
                 case 15:
-                    input += 'F';
-                    break;
-                case 16: 
                     input += 'F';
                     break;
                 default:
