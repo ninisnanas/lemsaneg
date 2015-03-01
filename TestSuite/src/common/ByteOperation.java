@@ -4,6 +4,8 @@
  */
 package common;
 
+import org.bouncycastle.crypto.params.ParametersWithIV;
+
 /**
  *
  * @author ASUS
@@ -28,7 +30,7 @@ public class ByteOperation {
         for(int i = 0; i < maxIndex; i++) {
             result[i] = (byte) (a[i] | b[i]);
         }
-        
+        ParametersWithIV keyiv;
         if(a.length > maxIndex) {
             for(int i = maxIndex; i < a.length; i++) {
                 result[i] = a[i];
