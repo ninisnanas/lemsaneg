@@ -5,6 +5,7 @@
 package common;
 import java.util.BitSet;
 import javax.xml.bind.DatatypeConverter;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * this class contains some generic functions related for test suite, bit operation etc
@@ -41,7 +42,8 @@ public class GeneralService {
      * @return 
      */
     public static byte[] getBytesFromHex(String hex) {
-        return DatatypeConverter.parseHexBinary(hex);
+        return Hex.decode(hex);
+        //return DatatypeConverter.parseHexBinary(hex);
     }
     
     /**
