@@ -7,9 +7,7 @@ import java.util.List;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.engines.AESEngine;
-import org.bouncycastle.crypto.engines.DESEngine;
 import org.bouncycastle.crypto.modes.CBCBlockCipher;
-import org.bouncycastle.crypto.modes.PaddedBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
@@ -38,7 +36,6 @@ public class BICTest implements UnitTestInterface {
     private BitSet bitSetBaseCipher;
     private BitSet bitSetTempPlain;
     private BitSet bitSetTempCipher;
-    private BitSet bitSetXOR;
     
     private Data[][] arrayOfRawData;
     private double[][] arrOfCoeffData;

@@ -34,9 +34,8 @@ public class AWDTest implements UnitTestInterface {
     private BitSet bitSetBaseCipher;
     private BitSet bitSetTempPlain;
     private BitSet bitSetTempCipher;
-    private BitSet bitSetXOR;
     
-    private int[] awd_result;
+    static private int[] awd_result;
     
     public AWDTest(BufferedBlockCipher blockCipher) {
         this.blockCipher = blockCipher;
@@ -74,7 +73,7 @@ public class AWDTest implements UnitTestInterface {
     public void runTest() throws Exception {
         String plainStr;
         int randomFlipIndex;
-        int hammingDistance;
+        int hammingWeight;
         for(int round = 0; round < numOfRound; round++) {
             plainStr = GeneralService.generateRandomHexText(blockSize/4);
             bitSetBasePlain = GeneralService.getBitSetFromHex(plainStr);
@@ -103,8 +102,8 @@ public class AWDTest implements UnitTestInterface {
             bitSetTempCipher = BitSet.valueOf(cipher);
             bitSetTempCipher.xor(bitSetBaseCipher);
             
-            hammingDistance = getHammingDistance(bitSetTempCipher);
-            awd_result[hammingDistance]++;
+            hammingWeight = getHammingWeight(bitSetTempCipher);
+            awd_result[hammingWeight]++;
         }
     }
 
@@ -128,7 +127,7 @@ public class AWDTest implements UnitTestInterface {
         System.out.println("Max value index: " + maxIdx);
     }
     
-    private int getHammingDistance(BitSet bitset) {
+    private int getHammingWeight(BitSet bitset) {
         int result = 0;
         for(int i = 0; i < bitset.size(); i++) {
             if(bitset.get(i))
@@ -136,5 +135,13 @@ public class AWDTest implements UnitTestInterface {
         }
         
         return result;
+    }
+    
+    public static void main(String ar[]) throws Exception {
+        BlockCipher engine = new AESEngine();
+	BufferedBlockCipher cipher = new BufferedBlockCipher(new CBCBlockCipher(engine));
+        AWDTest awd = new AWDTest(cipher);
+        awd.runTest();
+        GeneralService.writeToCSV(awd_result, "result.csv");
     }
 }
