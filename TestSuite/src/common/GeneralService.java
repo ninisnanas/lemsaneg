@@ -7,7 +7,10 @@ package common;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.Random;
 import javax.xml.bind.DatatypeConverter;
 import org.bouncycastle.util.encoders.Hex;
@@ -105,50 +108,163 @@ public class GeneralService {
         return result;
     }
 
-    public static byte[] generateZeroInput(int jumlahByte) {
+    public static byte[] generateInput(int jumlahByte, byte nilai) {
+        // Menginisialisasi variabel hasil
         byte[] hasil = new byte[jumlahByte];
 
+        // Loop untuk mengisi hasil
         for (int i = 0; i < jumlahByte; i++) {
-            hasil[i] = 0;
+            hasil[i] = nilai;
         }
 
+        // Mengembalikan hasil
         return hasil;
     }
 
     public static byte[] generateRandomInput(int jumlahByte) {
+        // Menginisialisasi variabel hasil
         byte[] hasil = new byte[jumlahByte];
-        Random rand = new Random();
-        rand.nextBytes(hasil);
 
+        // Mengisi hasil array
+        SecureRandom sr = new SecureRandom();
+        sr.nextBytes(hasil);
+
+        // Mengembalikan hasil
         return hasil;
     }
 
-    public static byte[] generateRandomSBox(int m, int n) {
-        int ukuranSbox = (int) Math.pow(2, m);
-        int ukuranIsi = (int) Math.pow(2, n);
-        byte[] sbox = new byte[ukuranSbox];
-        Random rand = new Random();
+    // Metode 1
+    public static byte[] generateSBox(int m, int n) {
+        // Kemungkinan input dan output
+        int kemungkinanInput = (int) Math.pow(2, m);
+        int kemungkinanOutput = (int) Math.pow(2, n);
+        if (kemungkinanOutput > kemungkinanInput) {
+            byte[] hasil = new byte[kemungkinanInput];
+			// Membuat array list Byte dan mengisinya berurut dari 0 sampai
+            // kemungkinan input % kemungkinan output
+            ArrayList<Byte> sboxList = new ArrayList<Byte>();
+            for (int i = 0; i < kemungkinanOutput; i++) {
+                sboxList.add((byte) (i % kemungkinanOutput));
+            }
 
-        for (int i = 0; i < ukuranSbox; i++) {
-            sbox[i] = (byte) rand.nextInt(ukuranIsi);
+            // Menshuffle sbox
+            Collections.shuffle(sboxList, new Random(new Random().nextLong()));
+
+            // Kopi ke array of byte
+            Byte[] hasilArr = sboxList.toArray(new Byte[kemungkinanInput]);
+            for (int i = 0; i < kemungkinanInput; i++) {
+                hasil[i] = hasilArr[i];
+            }
+
+            return hasil;
+        } else {
+            byte[] hasil = new byte[kemungkinanInput];
+			// Membuat array list Byte dan mengisinya berurut dari 0 sampai
+            // kemungkinan input % kemungkinan output
+            ArrayList<Byte> sboxList = new ArrayList<Byte>();
+            for (int i = 0; i < kemungkinanInput; i++) {
+                sboxList.add((byte) (i % kemungkinanOutput));
+            }
+
+            // Menshuffle sbox
+            Collections.shuffle(sboxList, new Random(new Random().nextLong()));
+
+            // Kopi ke array of byte
+            Byte[] hasilArr = sboxList.toArray(new Byte[sboxList.size()]);
+            for (int i = 0; i < kemungkinanInput; i++) {
+                hasil[i] = hasilArr[i];
+            }
+
+            return hasil;
         }
-
-        return sbox;
     }
 
-    public static byte[] hexToByte(String hex) {
-        return Hex.decode(hex);
+    // Metode 2
+    public static int[] generateSBoxInt(int m, int n) {
+        // Kemungkinan input dan output
+        int kemungkinanInput = (int) Math.pow(2, m);
+        int kemungkinanOutput = (int) Math.pow(2, n);
+        if (kemungkinanInput > kemungkinanOutput) {
+            int[] hasil = new int[kemungkinanInput];
+			// Membuat array list Byte dan mengisinya berurut dari 0 sampai
+            // kemungkinan input % kemungkinan output
+            ArrayList<Integer> sboxList = new ArrayList<Integer>();
+            for (int i = 0; i < kemungkinanInput; i++) {
+                sboxList.add(i % kemungkinanOutput);
+            }
+
+            // Menshuffle sbox
+            Collections.shuffle(sboxList, new Random(new Random().nextLong()));
+
+            // Kopi ke array of byte
+            Integer[] hasilArr = sboxList.toArray(new Integer[sboxList.size()]);
+            for (int i = 0; i < kemungkinanInput; i++) {
+                hasil[i] = hasilArr[i];
+            }
+
+            return hasil;
+        } else {
+            ArrayList<Integer> hasil = new ArrayList<Integer>();
+            Random rand = new Random();
+            for (int i = 0; i < kemungkinanInput; i++) {
+                int r = rand.nextInt(kemungkinanOutput);
+                while (hasil.contains(r)) {
+                    r = rand.nextInt(kemungkinanOutput);
+                }
+                hasil.add(r);
+            }
+
+            Integer[] hasilArr = hasil.toArray(new Integer[hasil.size()]);
+            int[] sbox = new int[kemungkinanInput];
+            for (int i = 0; i < kemungkinanInput; i++) {
+                sbox[i] = hasilArr[i];
+            }
+            return sbox;
+        }
     }
 
-    public static String byteToHex(byte[] bytes) {
-        return Hex.toHexString(bytes);
+    public static String byteArrayToHexa(byte[] arr) {
+        return Hex.toHexString(arr);
     }
 
-    public static int[] copyByteToInt(byte[] arr) {
+    public static String byteToHexa(byte b) {
+        byte[] arr = {b};
+        return Hex.toHexString(arr);
+    }
+
+    public static byte[] hexaToByteArray(String str) {
+        return Hex.decode(str);
+    }
+
+    public static int[] byteToInt(byte[] arr) {
         int[] hasil = new int[arr.length];
-        for (int i = 0; i < arr.length; i++) {
+        for (int i = 0; i < hasil.length; i++) {
             hasil[i] = arr[i] & 0xff;
+
         }
+        return hasil;
+    }
+
+    public static byte[] intArrToByteArr(int[] arr) {
+        byte[] hasil = new byte[arr.length * 4];
+        int j = 0;
+        for (int i = 0; i < hasil.length; i = i + 4) {
+            hasil[i] = (byte) (arr[j] & 0xff);
+            hasil[i + 1] = (byte) (arr[j] >> 8 & 0xff);
+            hasil[i + 2] = (byte) (arr[j] >> 16 & 0xff);
+            hasil[i + 3] = (byte) (arr[j] >> 24 & 0xff);
+            j++;
+        }
+        return hasil;
+    }
+
+    public static byte[] intToByte(int arr) {
+        byte[] hasil = new byte[4];
+        hasil[0] = (byte) (arr & 0xff);
+        hasil[1] = (byte) (arr >> 8 & 0xff);
+        hasil[2] = (byte) (arr >> 16 & 0xff);
+        hasil[3] = (byte) (arr >> 24 & 0xff);
+
         return hasil;
     }
 
@@ -166,9 +282,10 @@ public class GeneralService {
         File file = new File(location);
         PrintWriter pw = new PrintWriter(file);
         for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr.length; j++) {
+            for (int j = 0; j < arr[i].length; j++) {
                 pw.print(arr[i][j] + ",");
             }
+            pw.println();
         }
         pw.flush();
         pw.close();
