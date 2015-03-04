@@ -78,9 +78,9 @@ public class SACTest implements UnitTestInterface {
             plain = GeneralService.getBytesFromBitSet(bitSetBasePlain);
             
             if(isIV) {
-                cipher = EncryptionService.runEncryptionWithIV(blockCipher, plain, paramIV);
+                cipher = EncryptionService.runEncryption(plain, paramIV, blockCipher);
             } else {
-                cipher = EncryptionService.runEncryption(blockCipher, plain, paramKey);
+                cipher = EncryptionService.runEncryption(plain, paramKey, blockCipher);
             }
             
             bitSetBaseCipher = BitSet.valueOf(cipher);
@@ -92,9 +92,9 @@ public class SACTest implements UnitTestInterface {
                 plain = GeneralService.getBytesFromBitSet(bitSetTempPlain);
                 
                 if(isIV) {
-                cipher = EncryptionService.runEncryptionWithIV(blockCipher, plain, paramIV);
+                cipher = EncryptionService.runEncryption(plain, paramIV, blockCipher);
                 } else {
-                    cipher = EncryptionService.runEncryption(blockCipher, plain, paramKey);
+                    cipher = EncryptionService.runEncryption(plain, paramKey, blockCipher);
                 }
                 
                 bitSetTempCipher = BitSet.valueOf(cipher);
