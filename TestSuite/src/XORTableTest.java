@@ -1,5 +1,5 @@
 
-import common.GeneralService;
+import common.CommonService;
 import java.awt.BorderLayout;
 
 /*
@@ -19,7 +19,7 @@ public class XORTableTest {
     private int n;
 
     public XORTableTest(byte[] sbox, int m, int n) {
-        this.sbox = GeneralService.byteToInt(sbox);
+        this.sbox = CommonService.byteToInt(sbox);
         this.m = m;
         this.n = n;
         int ukuranSbox = (int) Math.pow(2, m);
@@ -28,9 +28,9 @@ public class XORTableTest {
     }
 
     public XORTableTest(int[] sbox) {
-        byte[] b = GeneralService.intArrToByteArr(sbox);
+        byte[] b = CommonService.intArrToByteArr(sbox);
 
-        this.sbox = GeneralService.byteToInt(b);
+        this.sbox = CommonService.byteToInt(b);
         int ukuranSbox = sbox.length;
 
         int ukuranIsi = findMax(this.sbox);
@@ -41,7 +41,7 @@ public class XORTableTest {
 
     public XORTableTest(byte[] sbox) {
 
-        this.sbox = GeneralService.byteToInt(sbox);
+        this.sbox = CommonService.byteToInt(sbox);
         int ukuranSbox = sbox.length;
 
         int ukuranIsi = findMax(this.sbox) + 1;

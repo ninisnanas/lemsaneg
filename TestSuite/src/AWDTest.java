@@ -1,140 +1,85 @@
 
+import common.CommonService;
 import common.EncryptionService;
-import common.GeneralService;
 import java.util.BitSet;
-import org.bouncycastle.crypto.BlockCipher;
+import java.util.Random;
+
 import org.bouncycastle.crypto.BufferedBlockCipher;
-import org.bouncycastle.crypto.engines.AESEngine;
-import org.bouncycastle.crypto.modes.CBCBlockCipher;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.util.Arrays;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+public class AWDTest {
 
-/**
- *
- * @author ASUS
- */
-public class AWDTest implements UnitTestInterface {
     private BufferedBlockCipher blockCipher;
-    private KeyParameter paramKey;
-    private ParametersWithIV paramIV;
-    private boolean isIV;
-    
-    private byte[] key;
-    private byte[] iv;
-    private byte[] plain;
+    private CipherParameters param;
     private byte[] cipher;
-    private int blockSize;
+    private int blocksize;
     private int numOfRound;
     private BitSet bitSetBasePlain;
-    private BitSet bitSetBaseCipher;
     private BitSet bitSetTempPlain;
+    private BitSet bitSetBaseCipher;
     private BitSet bitSetTempCipher;
-    private BitSet bitSetXOR;
-    
-    private int[] awd_result;
-    
-    public AWDTest(BufferedBlockCipher blockCipher) {
+    private int[] awdResults;
+
+    public AWDTest(BufferedBlockCipher blockCipher, CipherParameters param, int numOfRound) {
         this.blockCipher = blockCipher;
-        this.blockSize = 128;
-        this.numOfRound = 1000;
-        this.key = GeneralService.getBytesFromHex(GeneralService.generateRandomHexText(blockSize/4));
-        this.paramKey = new KeyParameter(key); 
-        this.isIV = false;
-        awd_result = new int[blockSize + 1];
-    }
-    
-    public AWDTest(BufferedBlockCipher blockCipher, byte[] key, int numOfRound, int blockSize) {
-        this.blockCipher = blockCipher;
-        this.key = key;
+        this.param = param;
+        this.blocksize = blockCipher.getBlockSize();
         this.numOfRound = numOfRound;
-        this.blockSize = blockSize;
-        this.paramKey = new KeyParameter(key);
-        this.isIV = false;
-        awd_result = new int[blockSize + 1];
-    }
-    
-    public AWDTest(BufferedBlockCipher blockCipher, byte[] key, byte[] iv, int numOfRound, int blockSize) {
-        this.blockCipher = blockCipher;
-        this.key = key;
-        this.iv = iv;
-        this.numOfRound = numOfRound;
-        this.blockSize = blockSize;
-        this.paramKey = new KeyParameter(key);
-        this.paramIV = new ParametersWithIV(paramKey, iv);
-        this.isIV = true;
-        awd_result = new int[blockSize + 1];
+        awdResults = new int[blocksize * 8 + 1];
+
     }
 
-    @Override
-    public void runTest() throws Exception {
-        String plainStr;
-        int randomFlipIndex;
-        int hammingDistance;
-        for(int round = 0; round < numOfRound; round++) {
-            plainStr = GeneralService.generateRandomHexText(blockSize/4);
-            bitSetBasePlain = GeneralService.getBitSetFromHex(plainStr);
-            plain = GeneralService.getBytesFromBitSet(bitSetBasePlain);
-            
-            if(isIV) {
-                cipher = EncryptionService.runEncryption(plain, paramIV, blockCipher);
-            } else {
-                cipher = EncryptionService.runEncryption(plain, paramKey, blockCipher);
-            }
-            
+    public void test() throws DataLengthException, IllegalStateException, InvalidCipherTextException {
+        // untuk setiap ronde
+        for (int ronde = 0; ronde < numOfRound; ronde++) {
+            // Random Plain
+            byte[] plain = CommonService.
+                    generateRandomInput(blocksize);
+            // Enkripsi plain
+            cipher = EncryptionService.
+                    runEncryption(plain, param, blockCipher);
+            cipher = Arrays.copyOf(cipher, blockCipher.getBlockSize());
+
+            // Konversi ke Bitset 
+            bitSetBasePlain = BitSet.valueOf(plain);
             bitSetBaseCipher = BitSet.valueOf(cipher);
-            randomFlipIndex = (int) (Math.random() * blockSize);
-            
-            bitSetTempPlain = BitSet.valueOf(GeneralService.getBytesFromBitSet(bitSetBasePlain));
-            bitSetTempPlain.flip(randomFlipIndex);
 
-            plain = GeneralService.getBytesFromBitSet(bitSetTempPlain);
+            // Random index
+            Random rand = new Random();
+            int randIndex = rand.nextInt(blocksize * 8);
 
-            if(isIV) {
-                cipher = EncryptionService.runEncryption(plain, paramIV, blockCipher);
-            } else {
-                cipher = EncryptionService.runEncryption(plain, paramKey, blockCipher);
-            }
+            // Flip bit
+            bitSetBasePlain.flip(randIndex);
 
+            // Kembalikan plain ke byte[]
+            plain = CommonService.bitsetToByte(bitSetBasePlain);
+
+            // Enkripsi plain yang sudah diflip
+            cipher = EncryptionService.
+                    runEncryption(plain, param, blockCipher);
+            cipher = Arrays.copyOf(cipher, blockCipher.getBlockSize());
+
+            // Konversi ke Bitset 
             bitSetTempCipher = BitSet.valueOf(cipher);
-            bitSetTempCipher.xor(bitSetBaseCipher);
-            
-            hammingDistance = getHammingDistance(bitSetTempCipher);
-            awd_result[hammingDistance]++;
+
+            // Xor
+            bitSetBaseCipher.xor(bitSetTempCipher);
+            // Hitung jumlah 1
+
+            int jumlahSatu = bitSetBaseCipher.cardinality();
+
+            // Masukkin hamming distance
+            awdResults[jumlahSatu]++;
         }
     }
 
-    @Override
-    public String getResult() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    private void printResult() {
-        int max = 0;
-        int maxIdx = -1;
-        for(int i = 0; i < awd_result.length; i++) {
-            if(awd_result[i] >= max) {
-                max = awd_result[i];
-                maxIdx = i;
-            }
-            System.out.println(i + ": " + awd_result[i]);
+    public void print() {
+        for (int i = 0; i < awdResults.length; i++) {
+            System.out.print(awdResults[i] + "\t");
         }
-        
-        System.out.println("Max value: " + max);
-        System.out.println("Max value index: " + maxIdx);
     }
-    
-    private int getHammingDistance(BitSet bitset) {
-        int result = 0;
-        for(int i = 0; i < bitset.size(); i++) {
-            if(bitset.get(i))
-                result++;
-        }
-        
-        return result;
-    }
+
 }

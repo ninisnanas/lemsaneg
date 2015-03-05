@@ -1,5 +1,5 @@
 
-import common.GeneralService;
+import common.CommonService;
 import java.io.FileNotFoundException;
 import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -24,7 +24,7 @@ public class XORTableMain {
             3, 10, 10, 6, 6, 12, 12, 11, 5, 9, 9, 5, 0, 3, 7, 8, 4, 15, 1,
             12, 14, 8, 8, 2, 13, 4, 6, 9, 2, 1, 11, 7, 15, 5, 12, 11, 9, 3,
             7, 14, 3, 10, 10, 0, 5, 6, 0, 13};
-        byte[] sbox2 = GeneralService.generateSBox(8, 12);
+        byte[] sbox2 = CommonService.generateSBox(8, 12);
         byte[] S = {(byte) 99, (byte) 124, (byte) 119, (byte) 123, (byte) 242,
             (byte) 107, (byte) 111, (byte) 197, (byte) 48, (byte) 1,
             (byte) 103, (byte) 43, (byte) 254, (byte) 215, (byte) 171,

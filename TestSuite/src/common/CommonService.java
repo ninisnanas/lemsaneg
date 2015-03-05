@@ -21,7 +21,7 @@ import org.bouncycastle.util.encoders.Hex;
  *
  * @author ASUS
  */
-public class GeneralService {
+public class CommonService {
 
     /**
      * get array of byte from specific bit set
@@ -29,14 +29,14 @@ public class GeneralService {
      * @param bitset
      * @return
      */
-    public static byte[] getBytesFromBitSet(BitSet bitset) {
-        byte[] bytes = new byte[(bitset.size() + 7) / 8];
-        for (int i = 0; i < bitset.length(); i++) {
-            if (bitset.get(i)) {
-                bytes[bytes.length - i / 8 - 1] |= 1 << (i % 8);
+    public static byte[] bitsetToByte(BitSet b) {
+        byte[] hasil = new byte[(b.size() + 7) / 8];
+        for (int i = 0; i < b.length(); i++) {
+            if (b.get(i)) {
+                hasil[hasil.length - i / 8 - 1] |= 1 << (i % 8);
             }
         }
-        return bytes;
+        return hasil;
     }
 
     /**
@@ -140,7 +140,7 @@ public class GeneralService {
         int kemungkinanOutput = (int) Math.pow(2, n);
         if (kemungkinanOutput > kemungkinanInput) {
             byte[] hasil = new byte[kemungkinanInput];
-			// Membuat array list Byte dan mengisinya berurut dari 0 sampai
+            // Membuat array list Byte dan mengisinya berurut dari 0 sampai
             // kemungkinan input % kemungkinan output
             ArrayList<Byte> sboxList = new ArrayList<Byte>();
             for (int i = 0; i < kemungkinanOutput; i++) {
@@ -159,7 +159,7 @@ public class GeneralService {
             return hasil;
         } else {
             byte[] hasil = new byte[kemungkinanInput];
-			// Membuat array list Byte dan mengisinya berurut dari 0 sampai
+            // Membuat array list Byte dan mengisinya berurut dari 0 sampai
             // kemungkinan input % kemungkinan output
             ArrayList<Byte> sboxList = new ArrayList<Byte>();
             for (int i = 0; i < kemungkinanInput; i++) {
@@ -186,7 +186,7 @@ public class GeneralService {
         int kemungkinanOutput = (int) Math.pow(2, n);
         if (kemungkinanInput > kemungkinanOutput) {
             int[] hasil = new int[kemungkinanInput];
-			// Membuat array list Byte dan mengisinya berurut dari 0 sampai
+            // Membuat array list Byte dan mengisinya berurut dari 0 sampai
             // kemungkinan input % kemungkinan output
             ArrayList<Integer> sboxList = new ArrayList<Integer>();
             for (int i = 0; i < kemungkinanInput; i++) {

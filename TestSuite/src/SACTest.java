@@ -1,6 +1,6 @@
 
 import common.EncryptionService;
-import common.GeneralService;
+import common.CommonService;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
@@ -44,7 +44,7 @@ public class SACTest implements UnitTestInterface {
         this.blockCipher = blockCipher;
         this.blockSize = 128;
         this.numOfRound = 100;
-        this.key = GeneralService.getBytesFromHex(GeneralService.generateRandomHexText(blockSize/4));
+        this.key = CommonService.getBytesFromHex(CommonService.generateRandomHexText(blockSize/4));
         this.paramKey = new KeyParameter(key); 
         this.isIV = false;
     }
@@ -73,9 +73,9 @@ public class SACTest implements UnitTestInterface {
     public void runTest() throws Exception {
         String plainStr;
         for(int round = 0; round < numOfRound; round++) {
-            plainStr = GeneralService.generateRandomHexText(blockSize/4);
-            bitSetBasePlain = GeneralService.getBitSetFromHex(plainStr);
-            plain = GeneralService.getBytesFromBitSet(bitSetBasePlain);
+            plainStr = CommonService.generateRandomHexText(blockSize/4);
+            bitSetBasePlain = CommonService.getBitSetFromHex(plainStr);
+            plain = CommonService.bitsetToByte(bitSetBasePlain);
             
             if(isIV) {
                 cipher = EncryptionService.runEncryption(plain, paramIV, blockCipher);
@@ -86,10 +86,10 @@ public class SACTest implements UnitTestInterface {
             bitSetBaseCipher = BitSet.valueOf(cipher);
             
             for(int idx = 0; idx < blockSize; idx++) {
-                bitSetTempPlain = BitSet.valueOf(GeneralService.getBytesFromBitSet(bitSetBasePlain));
+                bitSetTempPlain = BitSet.valueOf(CommonService.bitsetToByte(bitSetBasePlain));
                 bitSetTempPlain.flip(idx);
                 
-                plain = GeneralService.getBytesFromBitSet(bitSetTempPlain);
+                plain = CommonService.bitsetToByte(bitSetTempPlain);
                 
                 if(isIV) {
                 cipher = EncryptionService.runEncryption(plain, paramIV, blockCipher);
